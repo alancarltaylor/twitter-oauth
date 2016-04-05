@@ -7,12 +7,21 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var passport = require('passport');
 var Strategy = require('passport-twitter').Strategy;
+var cookieSession = require('cookie-session');
 
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
 
 var app = express();
+
+app.use(cookieSession({
+  name: 'session',
+  keys: [
+    process.env.SECRET_KEY1,
+    process.env.SECRET_KEY2
+  ]
+}));
 
 passport.use(new Strategy({
     consumerKey: process.env.TWITTER_CONSUMER_KEY,
@@ -30,7 +39,7 @@ passport.serializeUser(function(user, cb) {
 });
 
 passport.deserializeUser(function(obj, cb) {
-  cb(null, obj);
+  cb(null, user);
 });
 
 // app.get('/',
@@ -38,15 +47,15 @@ passport.deserializeUser(function(obj, cb) {
 //     res.render('home', { user: req.user });
 //   });
 
-app.get('/login',
-  function(req, res){
-    res.render('login');
-  });
+// app.get('/login',
+//   function(req, res){
+//     res.render('login');
+//   });
 
-app.get('/login/twitter',
+app.get('/auth/twitter/login',
   passport.authenticate('twitter'));
 
-app.get('/login/twitter/return',
+app.get('/auth/twitter/callback',
   passport.authenticate('twitter', { failureRedirect: '/login' }),
   function(req, res) {
     res.redirect('/');
@@ -57,6 +66,7 @@ app.get('/login/twitter/return',
 //   function(req, res){
 //     res.render('profile', { user: req.user });
 //   });
+
 
 
 // view engine setup
