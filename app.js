@@ -1,14 +1,63 @@
+require('dotenv').load()
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var passport = require('passport');
+var Strategy = require('passport-twitter').Strategy;
+
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
 
 var app = express();
+
+passport.use(new Strategy({
+    consumerKey: process.env.TWITTER_CONSUMER_KEY,
+    consumerSecret: process.env.TWITTER_CONSUMER_SECRET,
+    callbackURL: process.env.HOST + "/auth/twitter/callback"
+  },
+  function(token, tokenSecret, profile, cb) {
+    User.findOrCreate({ twitterId: profile.id }, function (err, user) {
+      return cb(err, user);
+    });
+  }
+));
+passport.serializeUser(function(user, cb) {
+  cb(null, user);
+});
+
+passport.deserializeUser(function(obj, cb) {
+  cb(null, obj);
+});
+
+// app.get('/',
+//   function(req, res) {
+//     res.render('home', { user: req.user });
+//   });
+
+app.get('/login',
+  function(req, res){
+    res.render('login');
+  });
+
+app.get('/login/twitter',
+  passport.authenticate('twitter'));
+
+app.get('/login/twitter/return',
+  passport.authenticate('twitter', { failureRedirect: '/login' }),
+  function(req, res) {
+    res.redirect('/');
+  });
+
+// app.get('/profile',
+//   require('connect-ensure-login').ensureLoggedIn(),
+//   function(req, res){
+//     res.render('profile', { user: req.user });
+//   });
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
