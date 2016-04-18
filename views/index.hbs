@@ -2,10 +2,11 @@
       <p>
         Hello {{user.displayName}}
         |
+        <a href="/profile">View your profile</a>
         <a href="/logout">Logout</a>
       </p>
     {{else}}
       <p>
-        <a href="/auth/twitter/login">Login</a>
+        <a href="/login">Please log in: Login</a>
       </p>
     {{/if}}
