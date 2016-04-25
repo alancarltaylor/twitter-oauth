@@ -10,8 +10,8 @@ var Strategy = require('passport-twitter').Strategy;
 var cookieSession = require('cookie-session');
 
 
-var routes = require('./routes/index');
-var users = require('./routes/users');
+// var routes = require('./routes/index');
+// var users = require('./routes/users');
 
 var app = express();
 
